@@ -1,0 +1,58 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.7'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'web.admin'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+configurations {
+	all {
+		// log4j2를 사용하기 위하여 기본로깅인 logback을 제외시킴
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+	implementation 'javax.servlet:jstl:1.2'
+
+	runtimeOnly 'org.postgresql:postgresql'
+	/**
+	 * mybatis
+	 */
+	implementation 'org.mybatis:mybatis-spring:2.0.6'
+	implementation 'org.mybatis:mybatis:3.5.6'
+	implementation 'org.springframework:spring-jdbc:5.3.18'
+	implementation 'com.oracle.ojdbc:ojdbc8:19.3.0.0'
+	implementation 'com.oracle.database.nls:orai18n:21.1.0.0'
+	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+
+	//log
+
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+	implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

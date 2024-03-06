@@ -1,0 +1,21 @@
+server:
+  port: 8055
+  session:
+    tracking-modes: cookie
+
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/Opentutorials?currentSchema=adminservice&characterEncoding=UTF-8&serverTimezone
+    username: postgres
+    password: MZHC
+
+imgPath: /src/main/webapp/images/pastedfile
+imgTmp: /src/main/webapp/images/tmp
+
+logging:
+  config: classpath:log4j2-spring.xml
