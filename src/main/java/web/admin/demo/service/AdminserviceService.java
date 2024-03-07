@@ -13,6 +13,7 @@ import web.admin.demo.util.ImageUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,14 +70,59 @@ public class AdminserviceService {
              }
          }
 
+        return result;
+    }
+
+    @Transactional
+    public int changeBoard(BoardDto dto) {
+        //메인 게시판 insert
+        int boardSeq = adminRepository.changeBoard(dto);
+        //주소 insert
+        dto.getAddress().setBoardSeq( dto.getBoardSeq());
+        adminRepository.changeAddress(dto.getAddress());
+        //첨부파일 insert
+        int result = 0;
+        if(dto.getAttachedFiles().size() != 0) {
+            for(Attached_file attachedfile : dto.getAttachedFiles()) {
+                attachedfile.setBoardSeq( dto.getBoardSeq());
+                result = adminRepository.changeAttachedFile(attachedfile);
+
+                if(result == SUCCESS) {
+                    try {
+                        ImageUtil.successCopy(attachedfile.getSaved_name());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+
         return 1;
     }
 
+
     public List<ResultDto> findAll() {
+
         return adminRepository.findAll();
+    }
+
+    public List<ResultDto> search(Map<String,Object> map) {
+        return adminRepository.search(map);
     }
 
     public Map<String,Object> findbyId(int boardseq) {
         return adminRepository.findbyId(boardseq);
+    }
+
+    @Transactional
+    public void delete( List<String> boardArr) {
+
+        for(String boardseq : boardArr) {
+            Map<String, Object> mapParam = new HashMap<>();
+            mapParam.put("boardSeq",Integer.parseInt(boardseq));
+            adminRepository.deleteBoard(mapParam);
+            adminRepository.deleteAddress(mapParam);
+            adminRepository.deleteAF(mapParam);
+        }
     }
 }

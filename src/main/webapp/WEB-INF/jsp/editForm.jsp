@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
       pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<head>
 <title>등록</title>
 </head>
 <body>
     <div id= "main_content_wrap">
-        <form action="/saveForm" id="saveForm"  method="post" enctype="multipart/form-data">
+        <form action="/changeForm" id="changeForm"  method="post" enctype="multipart/form-data">
             <div class ="selection_cell">
                 <select id="category" name="category">
                     <option value = "question">단순 질문</option>
@@ -14,9 +16,9 @@
                 </select>
                 <div style="display:flex">
                     공지 기간
-                    <input type="date" id= "startDate" name = "startDate" max="9999-12-31"></input>
+                    <input type="date" id= "startDate" name = "startDate" max="9999-12-31" disabled></input>
                     ~
-                    <input type="date" id= "endDate" name = "endDate" max="9999-12-31"></input>
+                    <input type="date" id= "endDate" name = "endDate" max="9999-12-31" disabled></input>
                 </div>
             </div>
             <div class ="selection_cell">
@@ -36,6 +38,7 @@
 
             <div class ="selection_cell">
                 선택
+
                 <input type="checkbox" name="checklist" id="checklist" value="1">1</input>
                 <input type="checkbox" name="checklist" id="checklist" value="2">2</input>
                 <input type="checkbox" name="checklist" id="checklist" value="3">3</input>
@@ -44,10 +47,10 @@
                 <input type="checkbox" name="checklist" id="checklist" value="6">6</input>
             </div>
             <div class ="selection_cell">
-                패스워드 <input id="password"  minlength="8" type="password" name="password"></input>
+                패스워드 <input id="password"  minlength="8" type="password" name="password" disabled></input>
             </div>
             <div class ="selection_cell">
-                <div id="pwInfo"> 8자리 이상, 특수문자와 대/소문자 영어, 숫자를 조합해야 하며 연속된 숫자 3자리 불가합니다.</div>
+
             </div>
             <div class ="selection_cell"> <!--선택필수-->
                 주소 구분
@@ -56,21 +59,22 @@
             </div>
             <div class ="selection_cell">
                 내용
-                <input  type="textarea"  name="content"></input>
+                <input  id ="content" type="textarea"  name="content"></input>
             </div>
             <div  id="pastedfile">
                 첨부파일
-                <a href="#this" onclick="addbox()">파일추가</a>
-                    <input type='file' name='attached_file'>
-                    <a href='#this' class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>
 
-                <!--<input type="file" onchange="addFile(this);" multiple />-->
+                <a href="#this" onclick="addbox()">파일추가</a>
+                <input type='file' name='attached_file'>
+                <a href='#this' class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>
+
                 <div class="file-list"></div>
             </div>
+            <input type='hidden' name='boardSeq' value = '${board.boardSeq}'/>
 
             <div class ="selection_cell">
-                <input type="button" value="삭제"></input>
-                <input type="button" id="save" value="저장" onclick="validation()"></input>
+                <input type="button" value="취소" onclick="window.location.href='/findById?boardSeq=${board.boardSeq}'"></input>
+                <input type="button" id="change" value="저장" onclick="validation()"></input>
             </div>
         </form>
     </div>
@@ -87,17 +91,39 @@ var fileNo = 0;
 var filesArr = new Array();
 
 window.onload = function() {
-        //공유 날짜 지정
-        today = new Date();
-        today = today.toISOString().slice(0, 10);
-        document.getElementById("startDate").value = today;
+       //사용자가 선택한 category
+       $('#category option[value="${board.category}"]').prop('selected', true);
+       $('#startDate').val( "${board.startdate}");
+       $('#endDate').val( "${board.enddate}");
+       $('#title').val("${board.title}");
+       $('#mainAddr').val("${board.mainaddr}");
+       $('#detailAddr').val("${board.detailaddr}");
+       $('#postalcode').val("${board.postalcode}");
+       $('#password').val("${board.password}");
+       $('#content').val("${board.content}");
 
-        week = new Date();
-        week.setDate(week.getDate() + 7);
-        week = week.toISOString().slice(0,10);
-        document.getElementById("endDate").value = week;
-    }
+       //radio
+       if("${board.typeaddr}" == 'new') {
+          $('#newAddr').prop("checked",true);
+       }
+       else if("${board.typeaddr}" == 'old') {
+          $('#oldAddr').prop("checked",true);
+       }
 
+       //checklist
+       <c:if test="${!empty checklist}">
+           <c:forEach items="${checklist}" var="num" >
+                $("input[name='checklist'][value='${num}']").prop("checked", true);
+           </c:forEach>
+       </c:if>
+
+        <c:if test="${!empty files}">
+            <c:forEach items="${files}" var="file" >
+
+            </c:forEach>
+        </c:if>
+
+}
 
 //주소 처리
 function execDaumPostcode() {
@@ -198,34 +224,7 @@ function execDaumPostcode() {
         var validationTitle = $('#title').val();
         var validationMainAddr = $('#mainAddr').val();
 
-        //if(filesArr.length != 0) {//첨부파일이 있음
-        //    var form = document.querySelector("#saveForm");
-        //    var formData = new FormData(form);
-        //    for (var i = 0; i < filesArr.length; i++) {
-                // 삭제되지 않은 파일만 폼데이터에 담기
-        //        if (!filesArr[i].is_delete) {
-        //            formData.append("files", filesArr[i]);
-        //        }
-        //   }
-        //}
-
-        //if(validationTitle == '') {
-        //    alert("제목을 작성해 주세요");
-        //    return;
-        //}
-        //else if(validationPw == false) { //비밀번호 조건 충족여부
-        //    alert("비밀번호를 확인해주세요");
-        //    return;
-        //}
-        //else if(validationMainAddr == '') {
-        //    alert("주소를 작성해 주세요");
-        //    return ;
-        //}
-        //else{
-        alert("!");
-            $('#saveForm').submit();
-
-        //}
+            $('#changeForm').submit();
 
     }
 
@@ -246,11 +245,11 @@ function addFile(obj){
             let htmlData = '';
             htmlData += '<div id="file' + fileNo + '" class="filebox">';
             htmlData += '   <p class="name">' + file.name + '</p>';
-            htmlData += '   <a class="delete" onclick="deleteFile(' + fileNo + ');"><i class="far fa-minus-square"></i></a>';
+            htmlData += '   <a class="delete" onclick="deleteFile();"><i class="far fa-minus-square"></i></a>';
             htmlData += '</div>';
 
             $('.file-list').append(htmlData);
-            fileNo++;
+            //fileNo++;
         } else {
             continue;
         }

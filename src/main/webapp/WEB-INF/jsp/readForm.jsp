@@ -16,7 +16,7 @@
                      <c:out value = "${board.enddate}"/></input>
                 </div>
             </div>
-            <div class ="selection_cell">
+            <div class ="selection_cell" >
                 제목  <c:out value = "${board.title}"/>
             </div>
             <div class ="selection_cell">
@@ -61,8 +61,8 @@
             </div>
 
             <div class ="selection_cell">
-                <input type="button" value="수정"></input>
-                <input type="button"><a href="/list">목록</a></input>
+                <input type="button" value="수정" onclick="window.location.href='/edit?boardSeq=${board.boardSeq}'"></input>
+                <input type="button" value="목록" onclick="window.location.href='/list'"></input>
             </div>
         </form>
     </div>

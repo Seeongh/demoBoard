@@ -6,10 +6,6 @@
         INSERT INTO adminservice.board
         (category, title, password_enc, writer, content, post_start_date, post_end_date, checklist)
         VALUES(#{category}, #{title}, #{password}, #{writer}, #{content}, to_date(#{startDate},'YYYY-MM-DD'), to_date(#{endDate},'YYYY-MM-DD'), #{checklist})
-        <!-- 자동 생성된 키를 위한 설정 -->
-<!--        <selectKey keyProperty="id" order="AFTER" resultType="int">-->
-<!--            SELECT LAST_INSERT_ID() AS board_seq-->
-<!--        </selectKey>-->
     </insert>
     <insert id="insAddress" parameterType="Address">
         INSERT INTO adminservice.address
@@ -23,6 +19,39 @@
         VALUES(#{boardSeq}, #{original_name}, #{saved_name}, #{size})
 
     </insert>
+
+    <update id="changeBoard" parameterType="BoardDto" useGeneratedKeys="true" keyProperty="boardSeq">
+        UPDATE adminservice.board
+        SET
+            category = #{category},
+            title = #{title},
+            writer = #{writer},
+            content =  #{content},
+            checklist = #{checklist}
+        WHERE board_seq = #{boardSeq}
+    </update>
+
+    <update id="changeAddress" parameterType="Address">
+        UPDATE adminservice.address
+        SET
+          mainAddr = #{mainAddr},
+          detailAddr =  #{detailAddr},
+          postalcode = #{postalcode},
+          typeAddr = #{typeAddr}
+        WHERE
+          board_seq_fk = #{boardSeq}
+
+    </update>
+    <update id="changeAttachedFile" parameterType="Attachedfile">
+        UPDATE adminservice.attached_files
+        SET
+          original_name = #{original_name},
+          saved_name = #{saved_name},
+          size = #{size}
+        WHERE
+          board_seq_fk = #{boardSeq}
+
+    </update>
 
     <select id="findbyId" parameterType="Map" resultType="camelMap">
         SELECT
@@ -54,7 +83,7 @@
             a.address_seq;
     </select>
 
-    <select id="findall"  resultType="ResultDto">
+    <select id="findall" resultType="ResultDto">
         SELECT	b.board_seq,
             b.post_start_date as startdate, b.post_end_date as enddate,
             b.category, b.title, b.password_enc as password, b.reg_time, b.writer, b.content, b.checklist,
@@ -66,9 +95,57 @@
             adminservice.address a ON b.board_seq = a.board_seq_fk
         LEFT JOIN
             adminservice.attached_files af ON b.board_seq = af.board_seq_fk
+        <choose>
+            <when  test='searchcondition != ""'>
+                WHERE
+                <if test='searchcondition == "allsearch"'>
+                    (
+                    b.title ILIKE concat('%',#{keyword},'%') OR
+                    b.writer ILIKE concat('%',#{keyword},'%')
+                    )
+                </if>
+                <if test='searchcondition == "titlesearch"'>
+                    (
+                    b.title ILIKE concat('%',#{keyword},'%')
+                    )
+                </if>
+                <if test='searchcondition == "namesearch"'>
+                    (
+                    b.writer LIKE concat('%',#{keyword},'%')
+                    )
+                </if>
+                <if test='regstart != ""'>
+                    AND b.reg_time &gt;= date(#{regstart})
+                </if>
+                <if test='regend != ""'>
+                    AND b.reg_time &lt;= date(#{regend})
+                </if>
+                <if test='typesearch != ""'>
+                    AND a.typeaddr = #{typesearch}
+                </if>
+            </when>
+        </choose>
         GROUP BY
             b.board_seq, a.typeaddr
         ORDER BY
             b.board_seq DESC;
+
     </select>
+    <delete id="deleteBoard"  parameterType="Map">
+        DELETE FROM
+            adminservice.board
+        WHERE board_seq = #{boardSeq}
+
+    </delete>
+    <delete id="deleteAddress"  parameterType="Map">
+        DELETE FROM
+            adminservice.address
+        WHERE board_seq_fk = #{boardSeq}
+
+    </delete>
+    <delete id="deleteAF"  parameterType="Map">
+        DELETE FROM
+            adminservice.attached_files
+        WHERE board_seq_fk = #{boardSeq}
+    </delete>
 </mapper>

@@ -209,23 +209,22 @@ function execDaumPostcode() {
         //   }
         //}
 
-        //if(validationTitle == '') {
-        //    alert("제목을 작성해 주세요");
-        //    return;
-        //}
-        //else if(validationPw == false) { //비밀번호 조건 충족여부
-        //    alert("비밀번호를 확인해주세요");
-        //    return;
-        //}
-        //else if(validationMainAddr == '') {
-        //    alert("주소를 작성해 주세요");
-        //    return ;
-        //}
-        //else{
-        alert("!");
+        if(validationTitle == '') {
+            alert("제목을 작성해 주세요");
+            return;
+        }
+        else if(validationPw == false) { //비밀번호 조건 충족여부
+            alert("비밀번호를 확인해주세요");
+            return;
+        }
+        else if(validationMainAddr == '') {
+            alert("주소를 작성해 주세요");
+            return ;
+        }
+        else{
             $('#saveForm').submit();
 
-        //}
+        }
 
     }
 
@@ -249,7 +248,7 @@ function addFile(obj){
             htmlData += '</div>';
 
             $('.file-list').append(htmlData);
-            fileNo++;
+            //fileNo++;
         } else {
             continue;
         }
@@ -281,18 +280,18 @@ function validationFile(obj) {
 //}
 
 function addbox() {
-    var str = "<input type='file' id='file" + fileNo + '" name='attached_file'><a href='#this'  class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>";
+    var str = "<input type='file' id='file" + fileNo + "' name='attached_file'><a href='#this'  class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>";
     $(".file-list").append(str);
-    //$("a[name='file-delete']").on("click", function(e) {
-    //    e.preventDefault();
-    //    deleteFile($(this));
-    //});
-    fileNo++;
+    $("a[name='file-delete']").on("click", function(e) {
+        e.preventDefault();
+        deleteFile($(this));
+    });
+    //fileNo++;
 }
 
 function deleteFile(obj) {
-    //obj.parent().remove();
-     document.querySelector("#file" + num).remove();
+    obj.parent().remove();
+    //document.querySelector("#file" + num).remove();
 }
 </script>
 </html>
