@@ -11,7 +11,7 @@ public class ResultDto {
     private String startDate;
     private String endDate;
     private String title;
-    private Address address;
+    private AddressVo addressVo;
     private String password;
     private String content;
     private String writer;
@@ -25,5 +25,6 @@ public class ResultDto {
     private String detailaddr;
     private String postalcode;
     private String[] files;
+    private String[] savefiles;
 
 }

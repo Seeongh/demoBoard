@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Data
 @NoArgsConstructor
 @Component
-public class Address {
+public class AddressVo {
     private String mainAddr;
     private String detailAddr;
     private String postalcode;

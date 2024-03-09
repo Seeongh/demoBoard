@@ -55,5 +55,18 @@ public class ImageUtil {
         Files.move(sourcePath, targetPath);  // 파일 이동
         Files.delete(sourcePath); //기존 경로 삭제
     }
+    public static void remove(String savedname) throws IOException {
+        Path sourcePath = Path.of(imgTmp + "/" + savedname);
+        Path targetPath = Path.of(imgPath + "/" + savedname);
+
+        //Files.delete(sourcePath);
+        // 소스 파일에 대한 읽기 권한 확인
+        if (!Files.isReadable(sourcePath)) {
+            // 읽기 권한이 없으면 예외를 던집니다.
+            log.info("권한없음");
+            return ;
+        }
+        Files.delete(sourcePath); //기존 경로 삭제
+    }
 
 }

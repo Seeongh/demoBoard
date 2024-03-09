@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import web.admin.demo.dto.Attached_file;
+import web.admin.demo.dto.Attached_fileVo;
 import web.admin.demo.dto.BoardDto;
 import web.admin.demo.dto.ResultDto;
 import web.admin.demo.repository.AdminserviceRepository;
@@ -26,12 +26,12 @@ public class AdminserviceService {
     private final int SUCCESS = 1;
 
 
-    public List<Attached_file> uploadFiles(MultipartFile[] files) throws Exception {
-        List<Attached_file> resultFile = new ArrayList();
+    public List<Attached_fileVo> uploadFiles(MultipartFile[] files) throws Exception {
+        List<Attached_fileVo> resultFile = new ArrayList();
         int cnt = 0;
         if(files.length != 0) { //첨부파일 존재
             for(MultipartFile file: files) {
-                Attached_file attachedFile = new Attached_file();
+                Attached_fileVo attachedFile = new Attached_fileVo();
                 attachedFile.setOriginal_name(file.getOriginalFilename());
                 attachedFile.setSaved_name(ImageUtil.write(file));
                 attachedFile.setSize(file.getSize());
@@ -50,12 +50,12 @@ public class AdminserviceService {
          log.info("ash boardSeq = "  + dto.getBoardSeq());
 
          //주소 insert
-         dto.getAddress().setBoardSeq( dto.getBoardSeq());
-         adminRepository.insAddress(dto.getAddress());
+         dto.getAddressVo().setBoardSeq( dto.getBoardSeq());
+         adminRepository.insAddress(dto.getAddressVo());
          //첨부파일 insert
          int result = 0;
          if(dto.getAttachedFiles() != null) {
-             for(Attached_file attachedfile : dto.getAttachedFiles()) {
+             for(Attached_fileVo attachedfile : dto.getAttachedFiles()) {
                  attachedfile.setBoardSeq( dto.getBoardSeq());
                  log.info("ash img:" + attachedfile.getOriginal_name());
                  result = adminRepository.insAttachedFile(attachedfile);
@@ -78,14 +78,14 @@ public class AdminserviceService {
         //메인 게시판 insert
         int boardSeq = adminRepository.changeBoard(dto);
         //주소 insert
-        dto.getAddress().setBoardSeq( dto.getBoardSeq());
-        adminRepository.changeAddress(dto.getAddress());
+        dto.getAddressVo().setBoardSeq( dto.getBoardSeq());
+        adminRepository.changeAddress(dto.getAddressVo());
         //첨부파일 insert
         int result = 0;
-        if(dto.getAttachedFiles().size() != 0) {
-            for(Attached_file attachedfile : dto.getAttachedFiles()) {
+        if(dto.getAttachedFiles() != null) {
+            for(Attached_fileVo attachedfile : dto.getAttachedFiles()) {
                 attachedfile.setBoardSeq( dto.getBoardSeq());
-                result = adminRepository.changeAttachedFile(attachedfile);
+                result = adminRepository.insAttachedFile(attachedfile);
 
                 if(result == SUCCESS) {
                     try {
@@ -101,9 +101,9 @@ public class AdminserviceService {
     }
 
 
-    public List<ResultDto> findAll() {
+    public List<ResultDto> findAll(Map<String,Object> map) {
 
-        return adminRepository.findAll();
+        return adminRepository.findAll(map);
     }
 
     public List<ResultDto> search(Map<String,Object> map) {
@@ -125,4 +125,14 @@ public class AdminserviceService {
             adminRepository.deleteAF(mapParam);
         }
     }
+
+    public String findfile(Map<String,Object> map) {
+        return adminRepository.findfile(map);
+    }
+
+    public void deletefiles(Map<String,Object> map) throws IOException {
+        adminRepository.deletefiles(map);
+        ImageUtil.remove((String)map.get("savedName"));
+    }
+    public int listCnt(Map<String,Object> map) { return adminRepository.listCnt(map); }
 }
