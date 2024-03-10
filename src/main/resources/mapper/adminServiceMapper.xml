@@ -60,7 +60,8 @@
             b.post_end_date as enddate,
             b.category, b.title, b.password_enc as password, b.reg_time, b.writer, b.content, b.checklist,
             a.*,
-            array_agg(original_name) AS files
+            array_agg(original_name) AS files,
+            array_agg(saved_name) AS savefiles
         FROM
             adminservice.board b
         LEFT JOIN
@@ -83,7 +84,7 @@
             a.address_seq;
     </select>
 
-    <select id="findall" resultType="ResultDto">
+    <select id="findall" parameterType="Map" resultType="ResultDto">
         SELECT	b.board_seq,
             b.post_start_date as startdate, b.post_end_date as enddate,
             b.category, b.title, b.password_enc as password, b.reg_time, b.writer, b.content, b.checklist,
@@ -96,7 +97,7 @@
         LEFT JOIN
             adminservice.attached_files af ON b.board_seq = af.board_seq_fk
         <choose>
-            <when  test='searchcondition != ""'>
+            <when test='type == "search"'>
                 WHERE
                 <if test='searchcondition == "allsearch"'>
                     (
@@ -120,10 +121,12 @@
                 <if test='regend != ""'>
                     AND b.reg_time &lt;= date(#{regend})
                 </if>
-                <if test='typesearch != ""'>
-                    AND a.typeaddr = #{typesearch}
+                <if test='typeAddr != ""'>
+                    AND a.typeaddr = #{typeAddr}
                 </if>
             </when>
+            <otherwise>
+            </otherwise>
         </choose>
         GROUP BY
             b.board_seq, a.typeaddr
@@ -148,4 +151,61 @@
             adminservice.attached_files
         WHERE board_seq_fk = #{boardSeq}
     </delete>
+    <select id ="findfile" parameterType="Map" resultType="String">
+        SELECT
+            saved_name
+        FROM
+            adminservice.attached_files
+        WHERE board_seq_fk = #{boardSeq} and original_name=#{originName}
+
+    </select>
+    <delete id="deletefiles" parameterType="Map">
+        DELETE FROM
+        adminservice.attached_files
+        WHERE board_seq_fk = #{boardSeq} and saved_name=#{savedName}
+    </delete>
+
+    <select id="listCnt" parameterType="Map" resultType="int">
+        SELECT	COUNT(*) as listCnt
+        FROM
+        adminservice.board b
+        LEFT JOIN
+        adminservice.address a ON b.board_seq = a.board_seq_fk
+        LEFT JOIN
+        adminservice.attached_files af ON b.board_seq = af.board_seq_fk
+        <choose>
+            <when test='type == "search"'>
+                WHERE
+                <if test='searchcondition == "allsearch"'>
+                    (
+                    b.title ILIKE concat('%',#{keyword},'%') OR
+                    b.writer ILIKE concat('%',#{keyword},'%')
+                    )
+                </if>
+                <if test='searchcondition == "titlesearch"'>
+                    (
+                    b.title ILIKE concat('%',#{keyword},'%')
+                    )
+                </if>
+                <if test='searchcondition == "namesearch"'>
+                    (
+                    b.writer LIKE concat('%',#{keyword},'%')
+                    )
+                </if>
+                <if test='regstart != ""'>
+                    AND b.reg_time &gt;= date(#{regstart})
+                </if>
+                <if test='regend != ""'>
+                    AND b.reg_time &lt;= date(#{regend})
+                </if>
+                <if test='typeAddr != ""'>
+                    AND a.typeaddr = #{typeAddr}
+                </if>
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+        GROUP BY
+        b.board_seq, a.typeaddr
+    </select>
 </mapper>

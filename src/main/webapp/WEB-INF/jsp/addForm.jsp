@@ -61,8 +61,6 @@
             <div  id="pastedfile">
                 첨부파일
                 <a href="#this" onclick="addbox()">파일추가</a>
-                    <input type='file' name='attached_file'>
-                    <a href='#this' class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>
 
                 <!--<input type="file" onchange="addFile(this);" multiple />-->
                 <div class="file-list"></div>
@@ -229,32 +227,32 @@ function execDaumPostcode() {
     }
 
 /* 첨부파일 추가 */
-function addFile(obj){
-    for (const file of obj.files) {
-        // 첨부파일 검증
-        if (validationFile(file)) {
-            // 파일 배열에 담기
-            var reader = new FileReader();
-            reader.onload = function () {
-                filesArr.push(file);
-            };
-            reader.readAsDataURL(file);
+function addFile(){
+    //for (const file of obj.files) {
+    //    // 첨부파일 검증
+    //    if (validationFile(file)) {
+    //        // 파일 배열에 담기
+    //        var reader = new FileReader();
+    //        reader.onload = function () {
+    //            filesArr.push(file);
+    //        };
+    //        reader.readAsDataURL(file);
 
             // 목록 추가
             let htmlData = '';
             htmlData += '<div id="file' + fileNo + '" class="filebox">';
-            htmlData += '   <p class="name">' + file.name + '</p>';
-            htmlData += '   <a class="delete" onclick="deleteFile(' + fileNo + ');"><i class="far fa-minus-square"></i></a>';
+            htmlData += '   <input type="file" id = "attachedfile'+fileNo+'" name="attached_file">';
+            htmlData += '   <a class="delete" onclick="deleteFile('+fileNo+');"><i class="far fa-minus-square"></i></a>';
             htmlData += '</div>';
 
             $('.file-list').append(htmlData);
-            //fileNo++;
-        } else {
-            continue;
-        }
-    }
+            fileNo++;
+    //    } else {
+    //        continue;
+    //    }
+    //}
     // 초기화
-    document.querySelector("input[type=file]").value = "";
+    //document.querySelector("input[type=file]").value = "";
 }
 
 function validationFile(obj) {
@@ -280,18 +278,26 @@ function validationFile(obj) {
 //}
 
 function addbox() {
-    var str = "<input type='file' id='file" + fileNo + "' name='attached_file'><a href='#this'  class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>";
+      alert("?");
+      let str = '';
+            str += '<div id="file' + fileNo + '" class="filebox">';
+            str += '   <input type="file" id = "attachedfile'+fileNo+'" name="attached_file">';
+            str += '   <a class="delete" onclick="deleteFile('+fileNo+');"><i class="far fa-minus-square"></i></a>';
+            str += '</div>';
     $(".file-list").append(str);
-    $("a[name='file-delete']").on("click", function(e) {
-        e.preventDefault();
-        deleteFile($(this));
-    });
-    //fileNo++;
+//    $("a[name='file-delete']").on("click", function(e) {
+//        e.preventDefault();
+//        deleteFile($(this));
+//    });
+    fileNo++;
 }
 
-function deleteFile(obj) {
-    obj.parent().remove();
-    //document.querySelector("#file" + num).remove();
+function deleteFile(fileNum) {
+    var fileDiv = document.getElementById("file" + fileNum);
+        if (fileDiv) {
+            fileDiv.remove();
+        }
+    document.querySelector("#attachedfile" + fileNum).remove();
 }
 </script>
 </html>

@@ -7,8 +7,8 @@
 </head>
 <body>
     <div id="main_content_wrap">
-        <div id="searchForm">
-            <form action="/search" method="post">
+        <div >
+            <form id="searchForm" action="/search" method="post">
                 검색
                 <select id="searchcondition" name="searchcondition">
                     <option value="allsearch" >전체</option>
@@ -75,7 +75,20 @@
 
 
         <input type="button" value="삭제" onclick="deleteBoard()"></input>
+
+
     </div>
+     <div>
+        <form id="page" action "/list" method="post">
+
+            <c:if test="${!empty totalPage}">
+                <c:forEach begin="1" end="${totalPage}" var="page">
+                    <c:out value="${page}"/>
+                </c:forEach>
+            </c:if>
+        </form>
+    </div>
+
 </body>
 <link rel="stylesheet" href="../../css/addForm.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -99,28 +112,29 @@ window.onload = function() {
 
 
 function searchkeyword() {
-    $.ajax({
-           type:"Post",
-           url:"/search",
-           dataType:"JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
-           data: {
- 		       "searchcondition": $('#searchcondition').val(),
-               "regstart": $('#regstart').val(),
-                "regend": $('#regend').val(),
-                "keyword" : $('#keyword').val(),
-                "typesearch" :$('input[name="typeAddr"]:checked').val()
+    $('#searchForm').submit();
+    //$.ajax({
+    //       type:"Post",
+    //       url:"/search",
+    //       dataType:"JSON", // 옵션이므로 JSON으로 받을게 아니면 안써도 됨
+    //       data: {
+ 	//	       "searchcondition": $('#searchcondition').val(),
+    //           "regstart": $('#regstart').val(),
+    //            "regend": $('#regend').val(),
+    //            "keyword" : $('#keyword').val(),
+    //            "typesearch" :$('input[name="typeAddr"]:checked').val()
 
-           },
-           success : function(data) {
-             makeList(data);
-           },
-           complete : function(data) {
-                 // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
-           },
-           error : function(xhr, status, error) {
-                console.log(error)
-           }
-     });
+    //       },
+    //       success : function(data) {
+    //         makeList(data);
+    //       },
+    //       complete : function(data) {
+    //             // 통신이 실패했어도 완료가 되었을 때 이 함수를 타게 된다.
+    //       },
+    //       error : function(xhr, status, error) {
+    //            console.log(error)
+    //       }
+    // });
 }
 
 function makeList(data) {

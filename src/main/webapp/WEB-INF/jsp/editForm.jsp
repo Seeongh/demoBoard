@@ -63,11 +63,17 @@
             </div>
             <div  id="pastedfile">
                 첨부파일
-
+                <c:if test="${!empty files}">
+                    <c:forEach items="${files}" var="file" >
+                         <div id="fileorigin">
+                                <c:out value="${file}"/>
+                                <a class="change" onclick="deleteorigin(this,'${file}')">
+                                    <i class="far fa-minus-square"></i>
+                                </a>
+                         </div>
+                    </c:forEach>
+                </c:if>
                 <a href="#this" onclick="addbox()">파일추가</a>
-                <input type='file' name='attached_file'>
-                <a href='#this' class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>
-
                 <div class="file-list"></div>
             </div>
             <input type='hidden' name='boardSeq' value = '${board.boardSeq}'/>
@@ -117,11 +123,6 @@ window.onload = function() {
            </c:forEach>
        </c:if>
 
-        <c:if test="${!empty files}">
-            <c:forEach items="${files}" var="file" >
-
-            </c:forEach>
-        </c:if>
 
 }
 
@@ -243,11 +244,7 @@ function addFile(obj){
 
             // 목록 추가
             let htmlData = '';
-            htmlData += '<div id="file' + fileNo + '" class="filebox">';
-            htmlData += '   <p class="name">' + file.name + '</p>';
-            htmlData += '   <a class="delete" onclick="deleteFile();"><i class="far fa-minus-square"></i></a>';
-            htmlData += '</div>';
-
+            htmlData += '   <a class="delete" onclick="deleteFile(this);"> <p class="name">' + file.name + '</p><i class="far fa-minus-square"></i></a>';
             $('.file-list').append(htmlData);
             //fileNo++;
         } else {
@@ -274,23 +271,35 @@ function validationFile(obj) {
         }
 }
 
-/* 첨부파일 삭제 */
-//function deleteFile(num) {
-//    document.querySelector("#file" + num).remove();
-//    filesArr[num].is_delete = true;
-//}
-
 function addbox() {
-    var str = "<input type='file' name='attached_file'><a href='#this' class ='delete' name='file-delete'><i class='far fa-minus-square'></i></a>";
+      alert("?");
+      let str = '';
+            str += '<div id="file' + fileNo + '" class="filebox">';
+            str += '   <input type="file" id = "attachedfile'+fileNo+'" name="attached_file">';
+            str += '   <a class="delete" onclick="deleteFile('+fileNo+');"><i class="far fa-minus-square"></i></a>';
+            str += '</div>';
     $(".file-list").append(str);
-    $("a[name='file-delete']").on("click", function(e) {
-        e.preventDefault();
-        deleteFile($(this));
-    });
+//    $("a[name='file-delete']").on("click", function(e) {
+//        e.preventDefault();
+//        deleteFile($(this));
+//    });
+    fileNo++;
 }
 
-function deleteFile(obj) {
-    obj.parent().remove();
+function deleteFile(fileNum) {
+    var fileDiv = document.getElementById("file" + fileNum);
+        if (fileDiv) {
+            fileDiv.remove();
+        }
+    document.querySelector("#attachedfile" + fileNum).remove();
+}
+
+function deleteorigin(obj,filename) {
+    alert(filename);
+    var str = '   <input type="hidden"  name="deleted_file" value="'+filename+'"/>';
+
+    $(".file-list").append(str);
+    obj.parentNode.remove();
 }
 </script>
 </html>

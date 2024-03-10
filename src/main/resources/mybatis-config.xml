@@ -11,8 +11,8 @@
     </settings>
    <typeAliases>
        <typeAlias type="web.admin.demo.dto.BoardDto" alias ="BoardDto"/>
-       <typeAlias type="web.admin.demo.dto.Address" alias ="Address"/>
-       <typeAlias type="web.admin.demo.dto.Attached_file" alias ="Attachedfile"/>
+       <typeAlias type="web.admin.demo.dto.AddressVo" alias ="Address"/>
+       <typeAlias type="web.admin.demo.dto.Attached_fileVo" alias ="Attachedfile"/>
        <typeAlias type="web.admin.demo.dto.ResultDto" alias="ResultDto"/>
 
 <!--        &lt;!&ndash; Dto 없이 Map 반환시 camel case 변환 Map &ndash;&gt;-->
