@@ -131,7 +131,9 @@
         GROUP BY
             b.board_seq, a.typeaddr
         ORDER BY
-            b.board_seq DESC;
+            b.board_seq DESC
+        OFFSET  #{StartContent}
+        LIMIT #{pageCiteria}
 
     </select>
     <delete id="deleteBoard"  parameterType="Map">
@@ -166,13 +168,11 @@
     </delete>
 
     <select id="listCnt" parameterType="Map" resultType="int">
-        SELECT	COUNT(*) as listCnt
+        SELECT	COUNT(*) AS listCnt
         FROM
         adminservice.board b
         LEFT JOIN
         adminservice.address a ON b.board_seq = a.board_seq_fk
-        LEFT JOIN
-        adminservice.attached_files af ON b.board_seq = af.board_seq_fk
         <choose>
             <when test='type == "search"'>
                 WHERE
@@ -205,7 +205,5 @@
             <otherwise>
             </otherwise>
         </choose>
-        GROUP BY
-        b.board_seq, a.typeaddr
     </select>
 </mapper>

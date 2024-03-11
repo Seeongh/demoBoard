@@ -83,7 +83,7 @@
 
             <c:if test="${!empty totalPage}">
                 <c:forEach begin="1" end="${totalPage}" var="page">
-                    <c:out value="${page}"/>
+                    <input type="button" class="pageInfo" id="pageInfo" value=" <c:out value="${page}"/>" />
                 </c:forEach>
             </c:if>
         </form>
@@ -99,7 +99,20 @@
 <script>
 var selectedAddrType = '';
 window.onload = function() {
-        //공유 날짜 지정
+
+
+        $(".pageInfo").click(function() {
+           // 클릭된 페이지 값을 가져와서 hidden input에 설정
+           var clickedPage = $(this).val();
+           $("#page").append("<input type='hidden' name='currentPage' value='" + clickedPage + "' />");
+
+           // form을 submit하여 해당 페이지로 이동
+           $("#page").submit();
+       });
+    }
+
+$(document).ready(function() {
+   //공유 날짜 지정
         today = new Date();
         today = today.toISOString().slice(0, 10);
         document.getElementById("regend").value = today;
@@ -108,8 +121,15 @@ window.onload = function() {
         week.setDate(week.getDate() - 7);
         week = week.toISOString().slice(0,10);
         document.getElementById("regstart").value = week;
-    }
 
+       var currentPage = '${currentPageInfo}';
+       $(".pageInfo").each(function() {
+           // 현재 페이지와 요소의 값이 같으면 배경색을 보라색으로 변경
+           if ($(this).val().trim() === currentPage.trim()) {
+               $(this).css("background-color", "pink");
+           }
+       });
+});
 
 function searchkeyword() {
     $('#searchForm').submit();

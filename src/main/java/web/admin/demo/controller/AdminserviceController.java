@@ -44,32 +44,35 @@ public class AdminserviceController {
         return "redirect:/list";
     }
 
-    @GetMapping("/list")
-    public String list(Model model, @RequestParam(value= "currentPage", defaultValue = "1" ) String currentPage) {
+    @PostMapping("/list")
+    public String list(Model model, @RequestParam(value= "currentPage", defaultValue = "1" ) int currentPage) {
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("type" , "all");
 
         PageVo page = new PageVo();
-        int totalCnt = page.getTotalPage(adminService.listCnt(paramMap));
-        paramMap.put("pageCiteria", page.getPageCriteria());
+        int totalCnt = page.getTotalPage(adminService.listCnt(paramMap)); //전체 컨텐츠 수를 넣으면 페이지 수를 RETURN 함
+        paramMap.put("pageCiteria", page.getPageCriteria()); // SQL - LIMIT 뒤에 올 한 페이지의 개수
 
-        int startContent = ( Integer.parseInt(currentPage) * page.getPageCriteria()) + 1 ;
-        paramMap.put("StartContent", Integer.parseInt(currentPage) *);
+        int startContent = ((currentPage)-1) * page.getPageCriteria() ;
+        paramMap.put("StartContent", startContent); //SQL - OFFSET 뒤에 올 시작 컨텐츠 위치
         List<ResultDto> resultDto = adminService.findAll(paramMap);
-
-
-
 
         model.addAttribute("list", resultDto);
         model.addAttribute("totalPage" , totalCnt);
-        log.info("ash+ mapList" + resultDto.toString());
+        model.addAttribute("currentPageInfo" , currentPage);
         return "/listView";
     }
 
     @PostMapping("/search")
-    public Object search(Model model,@RequestParam Map<String,Object> map) throws Exception {
-        log.info("ash map : "  + map.toString());
+    public Object search(Model model, @RequestParam Map<String,Object> map, @RequestParam(value= "currentPage", defaultValue = "1" ) int currentPage) throws Exception {
         map.put("type","search");
+        PageVo page = new PageVo();
+        int totalCnt = page.getTotalPage(adminService.listCnt(map)); //전체 컨텐츠 수를 넣으면 페이지 수를 RETURN 함
+        map.put("pageCiteria", page.getPageCriteria()); // SQL - LIMIT 뒤에 올 한 페이지의 개수
+
+        int startContent = ((currentPage)-1) * page.getPageCriteria() ;
+        map.put("StartContent", startContent); //SQL - OFFSET 뒤에 올 시작 컨텐츠 위치
+
         List<ResultDto> resultDto = adminService.findAll(map);
 
         model.addAttribute("list", resultDto);
